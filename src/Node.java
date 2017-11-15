@@ -3,6 +3,7 @@ public class Node {
 	private Node right_child;
 	private Node parent;
 	private Comparable data;
+	private int height;
 	
 	
 	public Node(){
@@ -10,6 +11,7 @@ public class Node {
 		right_child = null;
 		data = null;
 		parent = null;
+		height = 0;
 	}
 
 	public Node(Comparable data) {
@@ -17,6 +19,7 @@ public class Node {
 		left_child = null;
 		right_child = null;
 		parent = null;
+		height = 0;
 	}
 	
 	public Node(Comparable data, Node left_child, Node right_child, Node parent) {
@@ -41,6 +44,14 @@ public class Node {
 	public Node getParent() {
 		return parent;
 	}
+	
+	public int getHeight() {
+		return height;
+	}
+	
+	public void setHeight(int height) {
+		this.height = height;
+	}
 
 	public void setLeftChild(Node left_child) {
 		this.left_child = left_child;
@@ -56,5 +67,14 @@ public class Node {
 	
 	public void setParent(Node parent) {
 		this.parent = parent;
+	}
+	
+	public boolean isEmpty() {
+		if(data == null) {
+			return true;
+		}
+		else {
+			return false;
+		}
 	}
 }
