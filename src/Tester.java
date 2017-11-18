@@ -3,9 +3,10 @@ public class Tester {
 
 	public static void main(String[] args) {
 		AVLTree tree = new AVLTree();
+		MinHeap heap = new MinHeap();
 		
 		tree.insert(new Node(new Integer(5)));
-		System.out.println(tree.delete().getData());
+		System.out.println(tree.getRoot().getData());
 		tree.insert(new Node(new Integer(4)));
 		tree.insert(new Node(new Integer(4)));
 		System.out.println(tree.search(new Integer(5)));
@@ -16,6 +17,8 @@ public class Tester {
 		tree.insert(new Node(new Integer(9)));
 		System.out.println(tree.count(tree.getRoot(), 7, 15));
 		System.out.println(tree.search(new Integer(14)));
+		tree.inOrder(tree.getRoot());
+		tree.delete(new Node(new Integer(5)));
 		tree.inOrder(tree.getRoot());
 		
 		System.out.println();
