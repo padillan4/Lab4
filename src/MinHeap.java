@@ -18,45 +18,50 @@ public class MinHeap implements MyHeap {
 		Node newChild = new Node(value);
 		Node insert = root;
 		numEntries++;
-		String path = Integer.toBinaryString(numEntries);
-		path = path.substring(1);
-		
-		while(path.length() > 1){
-			if(path.charAt(0) == '1'){
-				insert = insert.getRightChild();
-			} else{
-				insert = insert.getLeftChild();
-			}
-			path = path.substring(1);	
-		}
-		
-		if(path.charAt(0) == '0'){
-			insert.setLeftChild(newChild);
+		if(numEntries > 1){
+			String path = Integer.toBinaryString(numEntries);
+			path = path.substring(1);
 			
+			while(path.length() > 1){
+				if(path.charAt(0) == '1'){
+					insert = insert.getRightChild();
+				} else{
+					insert = insert.getLeftChild();
+				}
+				path = path.substring(1);	
+			}
+			
+			if(path.charAt(0) == '0'){
+				insert.setLeftChild(newChild);
+			}else{
+				insert.setRightChild(newChild);
+			}
+			
+			newChild.setParent(insert);
+			
+			while(newChild != root){
+				Node parent = newChild.getParent();
+				if(parent.getData().compareTo(newChild.getData()) > 0){
+					//parent greater than new child
+					swap(newChild, parent);
+					newChild = parent;
+					
+				}
+				else{
+					break;
+				}
+			}
 		}else{
-			insert.setRightChild(newChild);
+			root.setData(value);
 		}
-		
-		newChild.setParent(insert);
-		
-		while(newChild.getParent() != null){
-			Node parent = newChild.getParent();
-			System.out.println(parent);
-			if(parent.getData().compareTo(newChild.getData()) > 0){
-				swap(parent, newChild);
-			}
-			else{
-				break;
-			}
-		}
-		
+			
 		return true;
 		
 		
 		
 	}
 	
-	@SuppressWarnings({ "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked", "unused" })
 	public boolean deleteMin(){
 		Node lastNode = root;
 		
@@ -71,26 +76,17 @@ public class MinHeap implements MyHeap {
 			}
 			path = path.substring(1);	
 		}
-		if (path.length() == 1){
+		if(path.length() == 1){
 			if(path.charAt(0) == '0'){
-				Node rootLeft = root.getLeftChild();
-				Node rootRight = root.getRightChild();
-				root = lastNode.getLeftChild();
-				root.setLeftChild(rootLeft);
-				root.setRightChild(rootRight);
+				root.setData(lastNode.getLeftChild().getData());
 				lastNode.setLeftChild(null);
 			}else{
-				Node rootLeft = root.getLeftChild();
-				Node rootRight = root.getRightChild();
-				root = lastNode.getRightChild();
-				root.setLeftChild(rootLeft);
-				root.setRightChild(rootRight);
+				root.setData(lastNode.getRightChild().getData());
 				lastNode.setRightChild(null);
 			}
 			numEntries--;
 			Node temp = root;
 			while(temp.getLeftChild() != null){
-				
 				Node leftChild = temp.getLeftChild();
 				Node rightChild = temp.getRightChild();
 				
@@ -98,12 +94,14 @@ public class MinHeap implements MyHeap {
 					//right child is smallest else left is
 					if(rightChild.getData().compareTo(temp.getData()) < 0){
 						swap(temp, rightChild);
+						temp = rightChild;
 					}else{
 						break;
 					}
 				}else{
 					if(leftChild.getData().compareTo(temp.getData()) < 0){
 						swap(temp, leftChild);
+						temp = leftChild;
 					}else{
 						break;
 					}
@@ -112,44 +110,48 @@ public class MinHeap implements MyHeap {
 		}else{
 			root = new Node();
 		}
-		
 		return true;
 	}
 	
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public boolean decreaseKey(Node key, Comparable updateValue){
-		key.setData(updateValue);
-		Node parent = key.getParent();
-		if ((parent != null) && parent.getData().compareTo(key.getData()) > 0){
-			while(key != root){
+		
+		Node actualKey = search(key.getData(), root);
+		actualKey.setData(updateValue);
+		
+		Node parent = actualKey.getParent();
+		if ((parent != null) && parent.getData().compareTo(actualKey.getData()) > 0){
+			while(actualKey != root){
 				
-				if(parent.getData().compareTo(key.getData()) > 0){
+				if(parent.getData().compareTo(actualKey.getData()) > 0){
 					//parent greater than new child
-					swap(parent, key);
+					swap(parent, actualKey);
 					
 				}
 				else{
 					break;
 				}
-				parent = key.getParent();
+				parent = actualKey.getParent();
 			}
-		}else if(key.getLeftChild().getData().compareTo(key.getData()) > 0 || key.getLeftChild().getData().compareTo(key.getData()) > 0){
-			Node temp = key;
+		}else if(actualKey.getLeftChild().getData().compareTo(actualKey.getData()) < 0 || actualKey.getRightChild().getData().compareTo(actualKey.getData()) < 0){
+			
+			Node temp = actualKey;
 			while(temp.getLeftChild() != null){
-				
 				Node leftChild = temp.getLeftChild();
 				Node rightChild = temp.getRightChild();
 				
-				if(rightChild != null && leftChild.getData().compareTo(rightChild.getData()) > 0){
+				if(leftChild.getData().compareTo(rightChild.getData()) > 0){
 					//right child is smallest else left is
 					if(rightChild.getData().compareTo(temp.getData()) < 0){
 						swap(temp, rightChild);
+						temp = rightChild;
 					}else{
 						break;
 					}
 				}else{
 					if(leftChild.getData().compareTo(temp.getData()) < 0){
 						swap(temp, leftChild);
+						temp = leftChild;
 					}else{
 						break;
 					}
@@ -162,61 +164,63 @@ public class MinHeap implements MyHeap {
 	@SuppressWarnings("unchecked")
 	public boolean delete(Node del){
 		Node lastNode = root;
-		
-		String path = Integer.toBinaryString(numEntries);
-		path = path.substring(1);
-		while(path.length() > 1){
-			if(path.charAt(0) == '1'){
-				lastNode = lastNode.getRightChild();
-			} else{
-				lastNode = lastNode.getLeftChild();
-			}
-			path = path.substring(1);	
-		}
-			if (path.length() == 1){
-			if(path.charAt(0) == '0'){
-				Node delLeft = del.getLeftChild();
-				Node delRight = del.getRightChild();
-				del = lastNode.getLeftChild();
-				del.setLeftChild(delLeft);
-				del.setRightChild(delRight);
-				lastNode.setLeftChild(null);
-			}else{
-				Node delLeft = del.getLeftChild();
-				Node delRight = del.getRightChild();
-				del = lastNode.getRightChild();
-				del.setLeftChild(delLeft);
-				del.setRightChild(delRight);
-				lastNode.setRightChild(null);
-			}
+		del = search(del.getData(), root);
+		System.out.println(del);
+		if(del != null){
+			String path = Integer.toBinaryString(numEntries);
+			path = path.substring(1);
 			
-			numEntries--;
-			Node temp = del;
-			while(temp.getLeftChild() != null){
-				
-				Node leftChild = temp.getLeftChild();
-				Node rightChild = temp.getRightChild();
-				
-				if(rightChild != null && leftChild.getData().compareTo(rightChild.getData()) > 0){
-					//right child is smallest else left is
-					if(rightChild.getData().compareTo(temp.getData()) < 0){
-						swap(temp, rightChild);
-					}else{
-						break;
-					}
+			while(path.length() > 1){
+				if(path.charAt(0) == '1'){
+					lastNode = lastNode.getRightChild();
+				} else{
+					lastNode = lastNode.getLeftChild();
+				}
+				path = path.substring(1);	
+			}
+			if(path.length() == 1){
+				if(path.charAt(0) == '0'){
+					del.setData(lastNode.getLeftChild().getData());
+					lastNode.setLeftChild(null);
 				}else{
-					if(leftChild.getData().compareTo(temp.getData()) < 0){
-						swap(temp, leftChild);
+					del.setData(lastNode.getRightChild().getData());
+					lastNode.setRightChild(null);
+				}
+				numEntries--;
+				Node temp = del;
+				while(temp.getLeftChild() != null){
+					Node leftChild = temp.getLeftChild();
+					Node rightChild = temp.getRightChild();
+					
+					if(leftChild.getData().compareTo(rightChild.getData()) > 0){
+						//right child is smallest else left is
+						if(rightChild.getData().compareTo(temp.getData()) > 0){
+							swap(temp, rightChild);
+							temp = rightChild;
+						}else{
+							break;
+						}
 					}else{
-						break;
+						if(leftChild.getData().compareTo(temp.getData()) > 0){
+							swap(temp, leftChild);
+							temp = leftChild;
+						}else{
+							break;
+						}
 					}
 				}
+			}else{
+				if(root==del){
+					root = new Node();
+					numEntries = 0;
+				}else{
+					return false;
+				}
 			}
+			return true;
 		}else{
-			root = new Node();
-			System.out.print("shit");
+			return false;
 		}
-		return true;
 	}
 	public boolean union(MyHeap heap){
 		// insert from one into other
@@ -233,134 +237,35 @@ public class MinHeap implements MyHeap {
 		return root.getData();
 	}
 	
-	private void swap(Node b, Node c){
-		if(b != root){
-			Node a = b.getParent();
-			
-			if (b.getLeftChild() == c){
-				Node d = b.getRightChild();
-				Node e = c.getLeftChild();
-				Node f = c.getRightChild();
-				
-				if(a.getLeftChild() == b){
-					a.setLeftChild(c);
-					c.setParent(a);
-				}else{
-					a.setRightChild(c);
-					c.setParent(a);
-				}
-				
-				b.setLeftChild(e);
-				b.setRightChild(f);
-				
-				if(e != null){
-					e.setParent(b);
-				}
-				
-				if(f != null){
-					f.setParent(b);
-				}
-				
-				b.setParent(c);
-				
-				c.setLeftChild(b);
-				c.setRightChild(d);
-				
-				if(d != null){
-					d.setParent(c);
-				}
-			}else{
-				Node d = b.getLeftChild();
-				Node e = c.getLeftChild();
-				Node f = c.getRightChild();
-				
-				if(a.getLeftChild() == b){
-					a.setLeftChild(c);
-					c.setParent(a);
-				}else{
-					a.setRightChild(c);
-					c.setParent(a);
-				}
-				
-				b.setLeftChild(e);
-				b.setRightChild(f);
-				
-				if(e != null){
-					e.setParent(b);
-				}
-				
-				if(f != null){
-					f.setParent(b);
-				}
-				
-				b.setParent(c);
-				
-				c.setRightChild(d);
-				c.setLeftChild(b);
-				System.out.print(d==c);
-				if(d != null){
-					d.setParent(c);
-				}
-			}
+	@SuppressWarnings("rawtypes")
+	private void swap(Node leftHand, Node rightHand){
+		Comparable swapSpace;
+		swapSpace = leftHand.getData();
+		leftHand.setData(rightHand.getData());
+		rightHand.setData(swapSpace);
+	}
+	
+	@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+	private Node search(Comparable val, Node subtree){
+		
+		if(subtree == null){
+			return null;
+		}
+		if(val.compareTo(subtree.getData()) == 0){
+			return subtree;
 		}else{
-			if (b.getLeftChild() == c){
-				Node d = b.getRightChild();
-				Node e = c.getLeftChild();
-				Node f = c.getRightChild();
-				
-				c.setParent(null);
-				root = c;
-				
-				b.setLeftChild(e);
-				b.setRightChild(f);
-				
-				if(e != null){
-					e.setParent(b);
-				}
-				
-				if(f != null){
-					f.setParent(b);
-				}
-				
-				b.setParent(c);
-				
-				c.setLeftChild(b);
-				c.setRightChild(d);
-				
-				if(d != null){
-					d.setParent(c);
-				}
-			}else{
-				Node d = b.getLeftChild();
-				Node e = c.getLeftChild();
-				Node f = c.getRightChild();
-				
-				c.setParent(null);
-				root = c;
-				
-				b.setLeftChild(e);
-				b.setRightChild(f);
-				
-				if(e != null){
-					e.setParent(b);
-				}
-				
-				if(f != null){
-					f.setParent(b);
-				}
-				
-				b.setParent(c);
-				
-				c.setRightChild(b);
-				c.setLeftChild(d);
-				
-				if(d != null){
-					d.setParent(c);
-				}
+			Node leftResult = search(val,subtree.getLeftChild());
+			Node rightResult = search(val, subtree.getRightChild());
+			
+			if(leftResult != null){
+				return leftResult;
+			}
+			if(rightResult != null){
+				return rightResult;
 			}
 		}
-	}	
-}
-
+		
+		return null;
+	}
 	
 }
